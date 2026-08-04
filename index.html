@@ -512,6 +512,16 @@
         .btn-ghost:active {
             transform: translateY(0px) scale(.96);
         }
+        .btn-exit {
+            background: transparent;
+            color: var(--coral);
+            box-shadow: inset 0 0 0 1.5px rgba(255, 106, 77, .35);
+        }
+        .btn-exit:hover {
+            background: rgba(51, 10, 10, .8);
+            box-shadow: inset 0 0 0 1.5px var(--coral), 0 0 22px rgba(255, 106, 77, .25);
+            transform: translateY(-2px);
+        }
 
         .sys {
             font-size: .62rem;
@@ -674,7 +684,7 @@
             right: 0;
         }
 
-        /* joystick base (always visible on touch) */
+        /* joystick base (left) */
         #joyBase {
             position: fixed;
             left: 60px;
@@ -711,55 +721,56 @@
             opacity: 1;
         }
 
-        /* fire button (touch) */
-        #fireBtn {
+        /* ----- right joystick (aim + fire) ----- */
+        #joyRightBase {
             position: fixed;
-            right: 40px;
-            bottom: 60px;
-            width: 80px;
-            height: 80px;
+            right: 60px;
+            bottom: 70px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
-            background: rgba(255, 194, 75, .12);
-            border: 2.5px solid rgba(255, 194, 75, .5);
+            background: rgba(30, 22, 4, .4);
+            border: 2px solid rgba(255, 194, 75, .2);
             z-index: 16;
-            pointer-events: auto;
-            touch-action: manipulation;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: "Bungee";
-            font-size: .8rem;
-            letter-spacing: .1em;
-            color: rgba(255, 194, 75, .7);
-            text-shadow: 0 0 16px rgba(255, 194, 75, .2);
-            transition: transform .15s, background .15s, border-color .15s;
+            pointer-events: none;
             opacity: 0;
-            transform: scale(.85);
-            user-select: none;
-            -webkit-user-select: none;
+            transition: opacity .3s;
+            transform: translate(50%, -50%);
         }
-        #fireBtn.show {
+        #joyRightBase.show {
             opacity: 1;
-            transform: scale(1);
         }
-        #fireBtn:active {
-            transform: scale(.88);
-            background: rgba(255, 194, 75, .25);
-            border-color: var(--amber);
+        #joyRightThumb {
+            position: fixed;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255, 194, 75, .15);
+            border: 2px solid var(--amber);
+            z-index: 17;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .2s;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 24px rgba(255, 194, 75, .15);
         }
-        #fireBtn.firing {
-            background: rgba(255, 194, 75, .25);
-            border-color: var(--amber);
-            transform: scale(.92);
+        #joyRightThumb.show {
+            opacity: 1;
         }
-        #fireBtn .label {
-            font-size: .6rem;
-            letter-spacing: .18em;
-            margin-top: 2px;
+
+        /* fire ring indicator on right joystick */
+        #fireRing {
+            position: fixed;
+            border-radius: 50%;
+            z-index: 16;
+            pointer-events: none;
+            opacity: 0;
+            transform: translate(-50%, -50%);
+            border: 2px solid rgba(255, 194, 75, .5);
+            transition: opacity .2s, transform .1s, width .1s, height .1s;
         }
-        #fireBtn .icon {
-            font-size: 1.4rem;
-            line-height: 1;
+        #fireRing.show {
+            opacity: 1;
         }
 
         /* reticle for touch aim */
@@ -813,7 +824,8 @@
             }
             #joyBase.show,
             #joyThumb.show,
-            #fireBtn.show {
+            #joyRightBase.show,
+            #joyRightThumb.show {
                 display: flex;
             }
         }
@@ -845,15 +857,15 @@
                 width: 34px;
                 height: 34px;
             }
-            #fireBtn {
-                width: 64px;
-                height: 64px;
-                right: 30px;
-                bottom: 48px;
-                font-size: .65rem;
+            #joyRightBase {
+                width: 80px;
+                height: 80px;
+                right: 45px;
+                bottom: 55px;
             }
-            #fireBtn .icon {
-                font-size: 1.1rem;
+            #joyRightThumb {
+                width: 34px;
+                height: 34px;
             }
             #depth {
                 left: .5rem;
@@ -888,6 +900,11 @@
             .intel .pt {
                 font-size: .6rem;
             }
+            #touchHint {
+                font-size: .45rem;
+                padding: .2rem .6rem;
+                bottom: .4rem;
+            }
         }
 
         @media(max-width:380px) {
@@ -901,15 +918,15 @@
                 width: 28px;
                 height: 28px;
             }
-            #fireBtn {
-                width: 54px;
-                height: 54px;
-                right: 24px;
-                bottom: 38px;
-                font-size: .55rem;
+            #joyRightBase {
+                width: 64px;
+                height: 64px;
+                right: 36px;
+                bottom: 44px;
             }
-            #fireBtn .icon {
-                font-size: .9rem;
+            #joyRightThumb {
+                width: 28px;
+                height: 28px;
             }
             .panel {
                 padding: .2rem .4rem .3rem;
@@ -935,6 +952,10 @@
             .depth-rail {
                 height: 30px;
             }
+            #touchHint {
+                font-size: .4rem;
+                padding: .15rem .5rem;
+            }
         }
 
         /* landscape phone warning */
@@ -952,15 +973,15 @@
                 width: 26px;
                 height: 26px;
             }
-            #fireBtn {
-                width: 50px;
-                height: 50px;
-                right: 24px;
-                bottom: 26px;
-                font-size: .5rem;
+            #joyRightBase {
+                width: 60px;
+                height: 60px;
+                right: 40px;
+                bottom: 30px;
             }
-            #fireBtn .icon {
-                font-size: .8rem;
+            #joyRightThumb {
+                width: 26px;
+                height: 26px;
             }
             .hud-top {
                 padding: .2rem .3rem;
@@ -1042,11 +1063,20 @@
         <div class="half half-left" id="touchLeft"></div>
         <div class="half half-right" id="touchRight"></div>
     </div>
+
+    <!-- Left Joystick (Move) -->
     <div id="joyBase"></div>
     <div id="joyThumb"></div>
-    <div id="fireBtn"><span class="icon">⚡</span><br><span class="label">FIRE</span></div>
+
+    <!-- Right Joystick (Aim + Fire) -->
+    <div id="joyRightBase"></div>
+    <div id="joyRightThumb"></div>
+    <div id="fireRing"></div>
+
+    <!-- Reticle -->
     <div id="reticle"></div>
-    <div id="touchHint">⬅️ MOVE &nbsp;·&nbsp; ➡️ AIM &amp; FIRE &nbsp;·&nbsp; 🔥 TAP BUTTON</div>
+
+    <div id="touchHint">⬅️ MOVE &nbsp;·&nbsp; ➡️ AIM &amp; FIRE &nbsp;·&nbsp; 🎯 DRAG RIGHT JOYSTICK</div>
 
     <!-- TITLE -->
     <div class="screen show" id="titleScreen">
@@ -1075,9 +1105,9 @@
                         <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">R RAPID</span><span class="ds">Fire rate ×2.2 for 7s.</span></div>
                         <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">W WIDE</span><span class="ds">Triple-bolt spread for 7s.</span></div>
                         <div class="sys" style="margin-top:.8rem">TOUCH CONTROLS</div>
-                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">⬅️</span><span class="nm">MOVE</span><span class="ds">Drag left half / joystick</span></div>
-                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">➡️</span><span class="nm">AIM + FIRE</span><span class="ds">Drag right half to aim &amp; auto-fire</span></div>
-                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">🔥</span><span class="nm">FIRE BUTTON</span><span class="ds">Tap &amp; hold for manual fire</span></div>
+                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">⬅️</span><span class="nm">MOVE</span><span class="ds">Drag left joystick / left half</span></div>
+                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">🎯</span><span class="nm">AIM + FIRE</span><span class="ds">Drag right joystick / right half</span></div>
+                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">🔥</span><span class="nm">AUTO-FIRE</span><span class="ds">Active while right joystick is dragged</span></div>
                     </div>
                 </div>
                 <div>
@@ -1090,11 +1120,11 @@
                     <div class="record-chip">◆ BEST SALVAGE&nbsp;&nbsp;<span id="titleBest">0</span></div>
                     <div style="margin-top:.8rem;padding:.5rem .6rem;background:rgba(61,242,207,.06);border:1px solid rgba(61,242,207,.15);clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);">
                         <div style="font-size:.55rem;letter-spacing:.2em;color:rgba(125,245,221,.6);">📱 TOUCH ENABLED</div>
-                        <div style="font-size:.7rem;color:var(--cyan);margin-top:.15rem;">Dual-stick · Fire button · Auto-fire</div>
+                        <div style="font-size:.7rem;color:var(--cyan);margin-top:.15rem;">Twin-stick · Auto-fire · Visual joysticks</div>
                     </div>
                 </div>
             </div>
-            <p class="foot">DEEPCURRENT v1.0 — KILLS CHAIN COMBO · GRAB GLOWING MOTES · DIVE SAFE</p>
+            <p class="foot">DEEPCURRENT v1.1 — KILLS CHAIN COMBO · GRAB GLOWING MOTES · DIVE SAFE</p>
         </div>
     </div>
 
@@ -1108,6 +1138,7 @@
                 <button class="btn btn-primary" id="resumeBtn">RESUME</button>
                 <button class="btn btn-ghost" id="pauseRestartBtn">RESTART</button>
                 <button class="btn btn-ghost" id="pauseMuteBtn">SOUND</button>
+                <button class="btn btn-exit" id="pauseExitBtn">✕ EXIT</button>
             </div>
         </div>
     </div>
@@ -1127,6 +1158,7 @@
             </div>
             <div class="btnrow">
                 <button class="btn btn-primary" id="againBtn">↻ &nbsp;RE-DIVE</button>
+                <button class="btn btn-exit" id="overExitBtn">✕ EXIT</button>
             </div>
             <p class="foot">PRESS <kbd>ENTER</kbd> TO DIVE AGAIN</p>
         </div>
@@ -1214,7 +1246,9 @@
                 titleBest = $('titleBest'),
                 joyBase = $('joyBase'),
                 joyThumb = $('joyThumb'),
-                fireBtn = $('fireBtn'),
+                joyRightBase = $('joyRightBase'),
+                joyRightThumb = $('joyRightThumb'),
+                fireRing = $('fireRing'),
                 reticleEl = $('reticle');
             titleBest.textContent = best.toLocaleString();
             bestVal.textContent = best.toLocaleString();
@@ -1315,12 +1349,13 @@
             const keys = {},
                 mouse = { x: W / 2, y: H / 2, down: false };
             let moveId = null,
-                fireId = null,
-                stickBase = { x: 0, y: 0 },
-                stickVec = { x: 0, y: 0 },
-                fireTouch = { x: 0, y: 0 };
+                aimId = null;
+            let stickBase = { x: 0, y: 0 },
+                stickVec = { x: 0, y: 0 };
+            let rightStickBase = { x: 0, y: 0 },
+                rightStickVec = { x: 0, y: 0 };
+            let aimTouch = { x: 0, y: 0 };
             let touchActive = false;
-            let fireBtnActive = false;
 
             // Detect touch device
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -1328,7 +1363,7 @@
             // Show touch controls on touch devices
             if (isTouch) {
                 joyBase.classList.add('show');
-                fireBtn.classList.add('show');
+                joyRightBase.classList.add('show');
             }
 
             // Keyboard
@@ -1364,7 +1399,7 @@
             function handleTouchStart(e) {
                 initAudio();
                 if (AC && AC.state === 'suspended') AC.resume();
-                if (e.target === cvs || e.target.closest('#touchOverlay') || e.target.closest('#fireBtn')) {
+                if (e.target === cvs || e.target.closest('#touchOverlay')) {
                     e.preventDefault();
                 }
                 touchActive = true;
@@ -1384,10 +1419,23 @@
                         joyThumb.style.top = pos.y + 'px';
                         joyThumb.classList.add('show');
                     }
-                    // Right half: aim + fire (or fire button)
-                    if (pos.x >= W * 0.4 && fireId === null) {
-                        fireId = t.identifier;
-                        fireTouch = { x: pos.x, y: pos.y };
+                    // Right half: aim + fire
+                    if (aimId === null && pos.x >= W * 0.4) {
+                        aimId = t.identifier;
+                        rightStickBase = { x: pos.x, y: pos.y };
+                        rightStickVec = { x: 0, y: 0 };
+                        aimTouch = { x: pos.x, y: pos.y };
+                        joyRightBase.style.left = pos.x + 'px';
+                        joyRightBase.style.top = pos.y + 'px';
+                        joyRightBase.classList.add('show');
+                        joyRightThumb.style.left = pos.x + 'px';
+                        joyRightThumb.style.top = pos.y + 'px';
+                        joyRightThumb.classList.add('show');
+                        fireRing.style.left = pos.x + 'px';
+                        fireRing.style.top = pos.y + 'px';
+                        fireRing.style.width = '70px';
+                        fireRing.style.height = '70px';
+                        fireRing.classList.add('show');
                         reticleEl.style.left = pos.x + 'px';
                         reticleEl.style.top = pos.y + 'px';
                         reticleEl.classList.add('show');
@@ -1411,10 +1459,25 @@
                         stickVec = { x: dx / maxR, y: dy / maxR };
                         joyThumb.style.left = (stickBase.x + dx) + 'px';
                         joyThumb.style.top = (stickBase.y + dy) + 'px';
-                    } else if (t.identifier === fireId) {
-                        fireTouch = { x: pos.x, y: pos.y };
-                        reticleEl.style.left = pos.x + 'px';
-                        reticleEl.style.top = pos.y + 'px';
+                    } else if (t.identifier === aimId) {
+                        let dx = pos.x - rightStickBase.x,
+                            dy = pos.y - rightStickBase.y;
+                        const m = Math.hypot(dx, dy);
+                        const maxR = Math.min(48, Math.min(W, H) * 0.08);
+                        if (m > maxR) { dx = dx / m * maxR;
+                            dy = dy / m * maxR; }
+                        rightStickVec = { x: dx / maxR, y: dy / maxR };
+                        aimTouch = { x: rightStickBase.x + dx, y: rightStickBase.y + dy };
+                        joyRightThumb.style.left = (rightStickBase.x + dx) + 'px';
+                        joyRightThumb.style.top = (rightStickBase.y + dy) + 'px';
+                        reticleEl.style.left = (rightStickBase.x + dx * 1.6) + 'px';
+                        reticleEl.style.top = (rightStickBase.y + dy * 1.6) + 'px';
+                        // Fire ring pulse
+                        const ringSize = 70 + 14 * (m / maxR);
+                        fireRing.style.width = ringSize + 'px';
+                        fireRing.style.height = ringSize + 'px';
+                        fireRing.style.left = rightStickBase.x + 'px';
+                        fireRing.style.top = rightStickBase.y + 'px';
                     }
                 }
             }
@@ -1429,60 +1492,22 @@
                         joyBase.classList.remove('show');
                         joyThumb.classList.remove('show');
                     }
-                    if (t.identifier === fireId) {
-                        fireId = null;
+                    if (t.identifier === aimId) {
+                        aimId = null;
+                        rightStickVec = { x: 0, y: 0 };
+                        joyRightBase.classList.remove('show');
+                        joyRightThumb.classList.remove('show');
+                        fireRing.classList.remove('show');
                         reticleEl.classList.remove('show');
                     }
                 }
-                if (moveId === null && fireId === null) touchActive = false;
+                if (moveId === null && aimId === null) touchActive = false;
             }
 
             addEventListener('touchstart', handleTouchStart, { passive: false });
             addEventListener('touchmove', handleTouchMove, { passive: false });
             addEventListener('touchend', handleTouchEnd, { passive: false });
             addEventListener('touchcancel', handleTouchEnd, { passive: false });
-
-            // Fire button (touch)
-            fireBtn.addEventListener('touchstart', e => {
-                e.preventDefault();
-                e.stopPropagation();
-                initAudio();
-                if (AC && AC.state === 'suspended') AC.resume();
-                fireBtnActive = true;
-                fireBtn.classList.add('firing');
-                // Also set a fake fire touch at the sub's position so aiming uses the sub's current aim
-                if (mode === 'playing' && !p.dead) {
-                    // Use the sub's current aim direction
-                }
-            }, { passive: false });
-
-            fireBtn.addEventListener('touchend', e => {
-                e.preventDefault();
-                fireBtnActive = false;
-                fireBtn.classList.remove('firing');
-            }, { passive: false });
-
-            fireBtn.addEventListener('touchcancel', e => {
-                fireBtnActive = false;
-                fireBtn.classList.remove('firing');
-            }, { passive: false });
-
-            // Mouse support for fire button
-            fireBtn.addEventListener('mousedown', e => {
-                e.preventDefault();
-                initAudio();
-                if (AC && AC.state === 'suspended') AC.resume();
-                fireBtnActive = true;
-                fireBtn.classList.add('firing');
-            });
-            fireBtn.addEventListener('mouseup', e => {
-                fireBtnActive = false;
-                fireBtn.classList.remove('firing');
-            });
-            fireBtn.addEventListener('mouseleave', e => {
-                fireBtnActive = false;
-                fireBtn.classList.remove('firing');
-            });
 
             /* ================= AMBIENT ================= */
             const snow = [];
@@ -1669,16 +1694,23 @@
                     if (m > 1) { tx /= m;
                         ty /= m; }
 
-                    // Aim: from mouse, touch fire, or fire button
-                    if (fireId !== null) {
-                        p.aim = Math.atan2(fireTouch.y - p.y, fireTouch.x - p.x);
-                    } else if (fireBtnActive) {
-                        // Use current aim direction (keep it)
+                    // Aim: from mouse OR right joystick OR right touch
+                    const useRightStick = aimId !== null && (Math.abs(rightStickVec.x) > 0.05 || Math.abs(rightStickVec
+                        .y) > 0.05);
+                    if (useRightStick) {
+                        // Aim from right joystick
+                        const aimAngle = Math.atan2(rightStickVec.y, rightStickVec.x);
+                        p.aim = aimAngle;
+                    } else if (aimId !== null) {
+                        // Fallback: use the raw touch position
+                        p.aim = Math.atan2(aimTouch.y - p.y, aimTouch.x - p.x);
                     } else {
                         p.aim = Math.atan2(mouse.y - p.y, mouse.x - p.x);
                     }
 
-                    const firing = mouse.down || keys.Space || keys.KeyJ || fireId !== null || fireBtnActive;
+                    // Firing: mouse down, space, OR right joystick active
+                    const firing = mouse.down || keys.Space || keys.KeyJ || (aimId !== null && (Math.abs(rightStickVec
+                        .x) > 0.08 || Math.abs(rightStickVec.y) > 0.08));
                     if (firing && p.fireCd <= 0) fire();
                 }
 
@@ -2325,6 +2357,17 @@
                 Object.assign(p, { x: W / 2, y: H / 2, vx: 0, vy: 0, aim: -Math.PI / 2, hp: 100, fireCd: 0, iframes: 0,
                     shield: 0, rapid: 0, spread: 0, dead: false });
                 comboEl.classList.remove('on');
+                // Reset touch states
+                moveId = null;
+                aimId = null;
+                stickVec = { x: 0, y: 0 };
+                rightStickVec = { x: 0, y: 0 };
+                joyBase.classList.remove('show');
+                joyThumb.classList.remove('show');
+                joyRightBase.classList.remove('show');
+                joyRightThumb.classList.remove('show');
+                fireRing.classList.remove('show');
+                reticleEl.classList.remove('show');
             }
 
             function startGame() {
@@ -2339,7 +2382,7 @@
                 // Show touch controls if touch device
                 if (isTouch) {
                     joyBase.classList.add('show');
-                    fireBtn.classList.add('show');
+                    joyRightBase.classList.add('show');
                 }
                 startWave(1);
             }
@@ -2349,6 +2392,21 @@
 
             function resume() { mode = 'playing';
                 show($('pauseScreen'), false); }
+
+            function goToTitle() {
+                mode = 'title';
+                show($('pauseScreen'), false);
+                show($('overScreen'), false);
+                show($('titleScreen'), true);
+                hudEl.classList.add('off');
+                document.body.classList.remove('critical');
+                resetGame();
+                // Restore best display
+                titleBest.textContent = best.toLocaleString();
+                bestVal.textContent = best.toLocaleString();
+                // Reset audio
+                if (master) master.gain.value = muted ? 0 : .16;
+            }
 
             const OVERLINES = ['The trench keeps what it takes.', 'Hull breach at terminal depth. Beacon silent.',
                 'Last ping received. No response. Current strong.', 'The light went out at '
@@ -2371,6 +2429,13 @@
                 $('overLine').textContent = isRecord ? 'A record haul dragged back from the dark. The trench will remember you.' :
                     'Hull breach at ' + Math.floor(depth).toLocaleString() + ' m. Beacon silent.';
                 show($('overScreen'), true);
+                // Reset touch states
+                joyBase.classList.remove('show');
+                joyThumb.classList.remove('show');
+                joyRightBase.classList.remove('show');
+                joyRightThumb.classList.remove('show');
+                fireRing.classList.remove('show');
+                reticleEl.classList.remove('show');
             }
 
             // Event listeners
@@ -2380,10 +2445,14 @@
                 $('briefing').classList.toggle('open'); });
             $('againBtn').addEventListener('click', e => { e.target.blur();
                 startGame(); });
+            $('overExitBtn').addEventListener('click', e => { e.target.blur();
+                goToTitle(); });
             $('resumeBtn').addEventListener('click', e => { e.target.blur();
                 resume(); });
             $('pauseRestartBtn').addEventListener('click', e => { e.target.blur();
                 startGame(); });
+            $('pauseExitBtn').addEventListener('click', e => { e.target.blur();
+                goToTitle(); });
             $('pauseBtn').addEventListener('click', e => { e.target.blur(); if (mode === 'playing') pause(); else if (
                     mode === 'paused') resume(); });
             $('muteBtn').addEventListener('click', e => { e.target.blur();
