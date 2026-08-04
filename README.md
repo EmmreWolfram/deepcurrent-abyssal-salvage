@@ -8,7 +8,7 @@
 
 ## 🎮 Play Now
 
-**[Play DEEPCURRENT in your browser →](https://your-username.github.io/deepcurrent-abyssal-salvage/)**
+**[Play DEEPCURRENT in your browser →](https://emmrewolfram.github.io/deepcurrent-abyssal-salvage/)**
 
 ## 📖 Overview
 
