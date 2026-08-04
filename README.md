@@ -6,8 +6,6 @@
 
 > **Pilot the last submersible into the trench. Burn through the abyssal swarm. Keep your hull in one piece.**
 
-![DEEPCURRENT Gameplay](https://via.placeholder.com/800x400/0a3040/3df2cf?text=DEEPCURRENT+Gameplay)
-
 ## 🎮 Play Now
 
 **[Play DEEPCURRENT in your browser →](https://your-username.github.io/deepcurrent-abyssal-salvage/)**
