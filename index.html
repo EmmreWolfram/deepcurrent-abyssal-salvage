@@ -1188,12 +1188,59 @@
             letter-spacing: .15em;
         }
 
+        /* ----- Side-by-Side Multi-Column Modal Grids (Briefing, Settings, About) ----- */
+        .briefing-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.2rem;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 1.2rem;
+        }
+        @media (max-width: 680px) and (orientation: portrait) {
+            .briefing-grid, .settings-grid, .about-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         /* ----- Ultra-Compact Main Window sizing for Mobile & Tablet screens in Landscape ----- */
         @media (max-height: 580px), (max-width: 950px) and (orientation: landscape) {
             .dossier {
-                padding: .6rem 1.1rem !important;
+                padding: .5rem 1rem !important;
                 max-height: 96vh !important;
-                width: min(860px, 98vw) !important;
+                width: min(880px, 98vw) !important;
+            }
+            .briefing-grid {
+                grid-template-columns: 1.05fr 0.95fr 1fr !important;
+                gap: 0.8rem !important;
+                align-items: start !important;
+            }
+            .settings-grid {
+                grid-template-columns: 1fr 1fr !important;
+                gap: 0.8rem !important;
+                align-items: center !important;
+            }
+            .about-grid {
+                grid-template-columns: 1.1fr 0.9fr !important;
+                gap: 1rem !important;
+                align-items: start !important;
+            }
+            .briefing-col .intel {
+                margin-bottom: .18rem !important;
+            }
+            .briefing-col .nm {
+                font-size: .6rem !important;
+            }
+            .briefing-col .ds {
+                font-size: .6rem !important;
+                line-height: 1.25 !important;
             }
             h1.logo {
                 font-size: clamp(1.3rem, 4.2vw, 2.1rem) !important;
@@ -1333,22 +1380,7 @@
                         <button class="btn btn-ghost" id="settingsBtn">⚙️ &nbsp;SETTINGS</button>
                         <button class="btn btn-ghost" id="aboutBtn">ℹ️ &nbsp;ABOUT</button>
                     </div>
-                    <div class="brief" id="briefing">
-                        <div class="sys">THREAT INTEL</div>
-                        <div class="intel"><span class="dot" style="color:#ff8a5c;background:#ff8a5c"></span><span class="nm">DRIFT MINE</span><span class="ds">Proximity bloom. Do not touch.</span><span class="pt">40</span></div>
-                        <div class="intel"><span class="dot" style="color:#3df2cf;background:#3df2cf"></span><span class="nm">ANGLER DRONE</span><span class="ds">Homing bite, follows the light.</span><span class="pt">80</span></div>
-                        <div class="intel"><span class="dot" style="color:#9dff8a;background:#9dff8a"></span><span class="nm">INK SPITTER</span><span class="ds">Keeps range, spits hot bolts.</span><span class="pt">120</span></div>
-                        <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">LEVIATHAN SHARD</span><span class="ds">Radial volleys. Bring the spread.</span><span class="pt">400</span></div>
-                        <div class="sys" style="margin-top:.8rem">SALVAGE CAPSULES</div>
-                        <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">+ HULL</span><span class="ds">Welds 35 integrity back on.</span></div>
-                        <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">S SHIELD</span><span class="ds">6s of untouchable sonar skin.</span></div>
-                        <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">R RAPID</span><span class="ds">Fire rate ×2.2 for 7s.</span></div>
-                        <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">W WIDE</span><span class="ds">Triple-bolt spread for 7s.</span></div>
-                        <div class="sys" style="margin-top:.8rem">TOUCH CONTROLS</div>
-                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">⬅️</span><span class="nm">MOVE</span><span class="ds">Drag left joystick / left half</span></div>
-                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">🎯</span><span class="nm">AIM + FIRE</span><span class="ds">Drag right joystick / right half</span></div>
-                        <div class="intel"><span style="font-size:1.2rem;line-height:1;">🔥</span><span class="nm">AUTO-FIRE</span><span class="ds">Active while right joystick is dragged</span></div>
-                    </div>
+
                 </div>
                 <div>
                     <div class="sys">CONTROLS</div>
@@ -1411,36 +1443,75 @@
         </div>
     </div>
 
-    <!-- SETTINGS SCREEN -->
-    <div class="screen" id="settingsScreen" style="z-index: 45;">
-        <div class="dossier" style="width:min(560px,94vw)">
-            <div class="tab">DSV-07 // CONFIG</div>
-            <p class="kicker">SYSTEM PREFERENCES</p>
-            <h2 class="over-title" style="font-size:clamp(1.5rem,5vw,2.4rem);margin-bottom:.4rem;">SETTINGS</h2>
-            <p class="tag" style="margin-bottom:1.4rem;">Customize control mechanics and interface telemetry.</p>
+    <!-- BRIEFING SCREEN -->
+    <div class="screen" id="briefingScreen" style="z-index: 45;">
+        <div class="dossier" style="width:min(900px,98vw)">
+            <div class="tab">DSV-07 // TRENCH INTEL</div>
+            <p class="kicker">HYDRONAULT BRIEFING &amp; COMBAT SYSTEMS</p>
+            <h2 class="over-title" style="font-size:clamp(1.4rem,4.5vw,2.4rem);margin-bottom:.3rem;">BRIEFING</h2>
             
-            <div class="sys" style="margin-bottom:.6rem;">TOUCH CONTROL MECHANICS</div>
-            <div class="setting-row">
-                <div>
-                    <div class="title">FIXED JOYSTICK</div>
-                    <div class="desc">
-                        Fixed: Joysticks remain anchored in the bottom corners.<br>
-                        Dynamic: Joysticks appear wherever your thumbs touch.
+            <div class="briefing-grid">
+                <div class="briefing-col">
+                    <div class="sys" style="margin-bottom:.4rem;">THREAT INTEL</div>
+                    <div class="intel"><span class="dot" style="color:#ff8a5c;background:#ff8a5c"></span><span class="nm">DRIFT MINE</span><span class="ds">Proximity bloom. Do not touch.</span><span class="pt">40</span></div>
+                    <div class="intel"><span class="dot" style="color:#3df2cf;background:#3df2cf"></span><span class="nm">ANGLER DRONE</span><span class="ds">Homing bite, follows the light.</span><span class="pt">80</span></div>
+                    <div class="intel"><span class="dot" style="color:#9dff8a;background:#9dff8a"></span><span class="nm">INK SPITTER</span><span class="ds">Keeps range, spits hot bolts.</span><span class="pt">120</span></div>
+                    <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">LEVIATHAN SHARD</span><span class="ds">Radial volleys. Bring the spread.</span><span class="pt">400</span></div>
+                </div>
+                <div class="briefing-col">
+                    <div class="sys" style="margin-bottom:.4rem;">SALVAGE CAPSULES</div>
+                    <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">+ HULL</span><span class="ds">Welds 35 integrity back on.</span></div>
+                    <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">S SHIELD</span><span class="ds">6s of untouchable sonar skin.</span></div>
+                    <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">R RAPID</span><span class="ds">Fire rate ×2.2 for 7s.</span></div>
+                    <div class="intel"><span class="dot" style="color:#ffc24b;background:#ffc24b"></span><span class="nm">W WIDE</span><span class="ds">Triple-bolt spread for 7s.</span></div>
+                </div>
+                <div class="briefing-col">
+                    <div class="sys" style="margin-bottom:.4rem;">TOUCH CONTROLS</div>
+                    <div class="intel"><span style="font-size:1.1rem;line-height:1;">⬅️</span><span class="nm">MOVE</span><span class="ds">Drag left joystick / left half</span></div>
+                    <div class="intel"><span style="font-size:1.1rem;line-height:1;">🎯</span><span class="nm">AIM + FIRE</span><span class="ds">Drag right joystick / right half</span></div>
+                    <div class="intel"><span style="font-size:1.1rem;line-height:1;">🔥</span><span class="nm">AUTO-FIRE</span><span class="ds">Active while right joystick is dragged</span></div>
+                    <div class="btnrow" style="margin-top:.7rem;border-top:1px solid rgba(61,242,207,.15);padding-top:.5rem;">
+                        <button class="btn btn-primary" id="briefingCloseBtn">✓ &nbsp;CLOSE</button>
                     </div>
                 </div>
-                <button class="btn btn-ghost" id="toggleFixedJoyBtn" style="min-width:140px;text-align:center;">OFF (DYNAMIC)</button>
             </div>
+        </div>
+    </div>
 
-            <div class="sys" style="margin-bottom:.6rem;">AUDIO SYSTEMS</div>
-            <div class="setting-row" style="margin-bottom:1.4rem;">
-                <div>
-                    <div class="title">SOUND EFFECTS</div>
-                    <div class="desc">Abyssal combat audio &amp; weapon feedback.</div>
+    <!-- SETTINGS SCREEN -->
+    <div class="screen" id="settingsScreen" style="z-index: 45;">
+        <div class="dossier" style="width:min(680px,96vw)">
+            <div class="tab">DSV-07 // CONFIG</div>
+            <p class="kicker">SYSTEM PREFERENCES</p>
+            <h2 class="over-title" style="font-size:clamp(1.4rem,4.5vw,2.4rem);margin-bottom:.3rem;">SETTINGS</h2>
+            
+            <div class="settings-grid">
+                <div class="settings-col" id="touchConfigSection">
+                    <div class="sys" style="margin-bottom:.3rem;">TOUCH CONTROL MECHANICS</div>
+                    <div class="setting-row" style="margin-bottom:0;">
+                        <div>
+                            <div class="title">FIXED JOYSTICK</div>
+                            <div class="desc">
+                                Fixed: Anchored in bottom corners.<br>
+                                Dynamic: Appear where you touch.
+                            </div>
+                        </div>
+                        <button class="btn btn-ghost" id="toggleFixedJoyBtn" style="min-width:130px;text-align:center;">OFF (DYNAMIC)</button>
+                    </div>
                 </div>
-                <button class="btn btn-ghost" id="toggleSoundBtn" style="min-width:140px;text-align:center;">ON</button>
+                <div class="settings-col">
+                    <div class="sys" style="margin-bottom:.3rem;">AUDIO SYSTEMS</div>
+                    <div class="setting-row" style="margin-bottom:0;">
+                        <div>
+                            <div class="title">SOUND EFFECTS</div>
+                            <div class="desc">Abyssal combat audio &amp; weapon feedback.</div>
+                        </div>
+                        <button class="btn btn-ghost" id="toggleSoundBtn" style="min-width:130px;text-align:center;">ON</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="btnrow" style="margin-top:1rem;">
+            <div class="btnrow" style="margin-top:.7rem;">
                 <button class="btn btn-primary" id="settingsCloseBtn">✓ &nbsp;APPLY &amp; CLOSE</button>
             </div>
         </div>
@@ -1448,42 +1519,42 @@
 
     <!-- ABOUT SCREEN -->
     <div class="screen" id="aboutScreen" style="z-index: 45;">
-        <div class="dossier" style="width:min(660px,94vw)">
+        <div class="dossier" style="width:min(760px,96vw)">
             <div class="tab">DSV-07 // DOSSIER</div>
             <p class="kicker">PROJECT OVERVIEW &amp; CREDITS</p>
-            <h2 class="over-title" style="font-size:clamp(1.5rem,5vw,2.4rem);margin-bottom:.4rem;">ABOUT</h2>
+            <h2 class="over-title" style="font-size:clamp(1.4rem,4.5vw,2.4rem);margin-bottom:.3rem;">ABOUT</h2>
             
-            <div class="sys" style="margin-bottom:.5rem;">PROJECT MISSION</div>
-            <p class="about-desc">
-                <b>DEEPCURRENT</b> is basically a personal project to experiment if it’s possible to create certain control mechanics fit for mobile games.
-            </p>
-            
-            <div class="sys" style="margin-bottom:.5rem;">WHAT WE DID &amp; LEARNED</div>
-            <p class="about-desc" style="margin-bottom:1.2rem;font-size:clamp(.8rem,2vw,.9rem);color:rgba(217,246,240,.85);line-height:1.55;">
-                We tested twin-stick controls on mobile where aiming with the right stick automatically shoots your weapon. From testing on phones and tablets, we learned that clear visual hints (like the aiming target and fire ring) and giving players the choice between fixed or floating joysticks make mobile controls feel smooth, precise, and comfortable.
-            </p>
-
-            <div class="sys" style="margin-bottom:.6rem;">DEVELOPER &amp; CREDITS</div>
-            <div style="padding:.85rem 1.1rem;background:rgba(61,242,207,.06);border:1px solid rgba(61,242,207,.25);margin-bottom:1.3rem;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);">
-                <div style="font-size:.58rem;letter-spacing:.25em;color:var(--cyan);font-weight:700;">CREATED BY</div>
-                <div style="font-size:1.1rem;color:var(--amber);font-weight:700;margin-top:.2rem;">Emmanuel Angelo M. De Castro (Emmre)</div>
-                <div style="font-size:.75rem;color:rgba(217,246,240,.75);margin-top:.3rem;">
-                    Game Design · Touch Mechanics R&amp;D · Abyssal Combat Systems
+            <div class="about-grid">
+                <div class="about-col">
+                    <div class="sys" style="margin-bottom:.3rem;">PROJECT MISSION</div>
+                    <p class="about-desc">
+                        <b>DEEPCURRENT</b> is basically a personal project to experiment if it’s possible to create certain control mechanics fit for mobile games.
+                    </p>
+                    <div class="sys" style="margin-bottom:.3rem;">WHAT WE DID &amp; LEARNED</div>
+                    <p class="about-desc" style="margin-bottom:.5rem;">
+                        We tested twin-stick controls on mobile where aiming with the right stick automatically shoots your weapon. From testing on phones and tablets, we learned that clear visual hints (like the aiming target and fire ring) and giving players the choice between fixed or floating joysticks make mobile controls feel smooth, precise, and comfortable.
+                    </p>
                 </div>
-            </div>
-
-            <div class="sys" style="margin-bottom:.6rem;">STUDIO &amp; SUPPORT</div>
-            <div class="btnrow" style="margin-bottom:1.4rem;flex-wrap:wrap;gap:.6rem;">
-                <a href="https://www.facebook.com/profile.php?id=61577297810780" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
-                    <span>🌐</span> <span>STUDIO PAGE</span>
-                </a>
-                <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thelandfathers%40gmail.com" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;" id="supportEmailBtn" title="thelandfathers@gmail.com">
-                    <span>✉️</span> <span>SUPPORT</span>
-                </a>
-            </div>
-
-            <div class="btnrow" style="margin-top:1rem;border-top:1px solid rgba(61,242,207,.15);padding-top:1rem;">
-                <button class="btn btn-primary" id="aboutCloseBtn">✓ &nbsp;CLOSE</button>
+                <div class="about-col">
+                    <div class="sys" style="margin-bottom:.3rem;">DEVELOPER &amp; CREDITS</div>
+                    <div class="dev-card" style="padding:.6rem .8rem;background:rgba(61,242,207,.06);border:1px solid rgba(61,242,207,.25);margin-bottom:.7rem;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);">
+                        <div class="dev-lbl" style="font-size:.55rem;letter-spacing:.25em;color:var(--cyan);font-weight:700;">CREATED BY</div>
+                        <div class="dev-name" style="font-size:.95rem;color:var(--amber);font-weight:700;margin-top:.15rem;">Emmanuel Angelo M. De Castro (Emmre)</div>
+                        <div class="dev-role" style="font-size:.7rem;color:rgba(217,246,240,.75);margin-top:.2rem;">Game Design · Touch Mechanics R&amp;D</div>
+                    </div>
+                    <div class="sys" style="margin-bottom:.3rem;">STUDIO &amp; SUPPORT</div>
+                    <div class="btnrow" style="margin-bottom:.6rem;flex-wrap:wrap;gap:.5rem;">
+                        <a href="https://www.facebook.com/profile.php?id=61577297810780" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;">
+                            <span>🌐</span> <span>STUDIO PAGE</span>
+                        </a>
+                        <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thelandfathers%40gmail.com" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;gap:.4rem;" id="supportEmailBtn" title="thelandfathers@gmail.com">
+                            <span>✉️</span> <span>SUPPORT</span>
+                        </a>
+                    </div>
+                    <div class="btnrow" style="margin-top:.4rem;border-top:1px solid rgba(61,242,207,.15);padding-top:.4rem;">
+                        <button class="btn btn-primary" id="aboutCloseBtn">✓ &nbsp;CLOSE</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -2926,6 +2997,7 @@
                 show($('pauseScreen'), false);
                 show($('aboutScreen'), false);
                 show($('settingsScreen'), false);
+                show($('briefingScreen'), false);
                 hudEl.classList.remove('off');
                 updateJoystickAnchors();
                 checkOrientationNotice();
@@ -2944,6 +3016,7 @@
                 show($('overScreen'), false);
                 show($('aboutScreen'), false);
                 show($('settingsScreen'), false);
+                show($('briefingScreen'), false);
                 show($('titleScreen'), true);
                 hudEl.classList.add('off');
                 document.body.classList.remove('critical');
@@ -3035,8 +3108,19 @@
                 toggleMute(); });
             $('diveBtn').addEventListener('click', e => { e.target.blur();
                 startGame(); });
+            function openBriefing() {
+                show($('briefingScreen'), true);
+            }
+            function closeBriefing() {
+                show($('briefingScreen'), false);
+            }
             $('briefBtn').addEventListener('click', e => { e.target.blur();
-                $('briefing').classList.toggle('open'); });
+                openBriefing(); });
+            $('briefingCloseBtn').addEventListener('click', e => { e.target.blur();
+                closeBriefing(); });
+            $('briefingScreen').addEventListener('click', e => {
+                if (e.target === $('briefingScreen')) closeBriefing();
+            });
             $('againBtn').addEventListener('click', e => { e.target.blur();
                 startGame(); });
             $('overExitBtn').addEventListener('click', e => { e.target.blur();
@@ -3082,5 +3166,5 @@
             addEventListener('resize', setVH);
         })();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26cd0203c12ef69',t:'MTc4NjAwNjQyNQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26ce502cecdff8d',t:'MTc4NjAwNzI4MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
