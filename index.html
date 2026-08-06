@@ -735,7 +735,7 @@
             pointer-events: none;
             opacity: 0;
             transition: opacity .3s;
-            transform: translate(50%, -50%);
+            transform: translate(-50%, -50%);
         }
         #joyRightBase.show {
             opacity: 1;
@@ -1131,7 +1131,51 @@
                 padding: 1.1rem;
             }
         }
+
+        /* ----- Compact Main Window sizing for Mobile & Tablet screens ----- */
+        @media (max-height: 640px), (max-width: 900px) and (orientation: landscape) {
+            .dossier {
+                padding: .75rem 1.2rem;
+                max-height: 94vh;
+                width: min(840px, 96vw);
+            }
+            h1.logo {
+                font-size: clamp(1.4rem, 4.8vw, 2.4rem);
+            }
+            .kicker {
+                margin: 0 0 .3rem;
+                font-size: .5rem;
+            }
+            .tag {
+                margin: .4rem 0 .7rem;
+                font-size: clamp(.72rem, 1.6vw, .84rem);
+                line-height: 1.35;
+            }
+            .btnrow {
+                gap: .5rem;
+                margin: .3rem 0 .7rem;
+            }
+            .btn {
+                padding: .48rem 1.05rem;
+                font-size: .78rem;
+            }
+            .grid {
+                gap: .8rem;
+            }
+            .intel {
+                margin-bottom: .25rem;
+            }
+            .ctl {
+                padding: .18rem 0;
+            }
+            .orientation-notice-box {
+                padding: .45rem .7rem;
+                margin-top: .5rem;
+                font-size: .7rem;
+            }
+        }
     </style>
+
 
 </head>
 <body>
@@ -1382,12 +1426,18 @@
                 const winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
                 const winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
                 
-                // Keep logical game world within optimal balanced twin-stick shooter resolution (prevents PC zoom-out from increasing spawn range or making screen huge)
-                const maxLogicalW = 1500;
-                const maxLogicalH = 900;
-                const scaleX = winW > maxLogicalW ? winW / maxLogicalW : 1;
-                const scaleY = winH > maxLogicalH ? winH / maxLogicalH : 1;
-                zoomScale = Math.max(1, Math.max(scaleX, scaleY));
+                // Keep logical game world within balanced resolution range [720x405 to 1440x810]
+                // - Prevents PC zoom-out from expanding spawn range or making screen huge
+                // - Prevents small screens from making enemies spawn too close or feeling tiny
+                const minLogicalW = 720;
+                const minLogicalH = 405;
+                const maxLogicalW = 1440;
+                const maxLogicalH = 810;
+                
+                let scaleX = winW < minLogicalW ? winW / minLogicalW : (winW > maxLogicalW ? winW / maxLogicalW : 1);
+                let scaleY = winH < minLogicalH ? winH / minLogicalH : (winH > maxLogicalH ? winH / maxLogicalH : 1);
+                
+                zoomScale = Math.min(scaleX, scaleY) < 1 ? Math.min(scaleX, scaleY) : Math.max(1, Math.max(scaleX, scaleY));
 
                 W = Math.floor(winW / zoomScale);
                 H = Math.floor(winH / zoomScale);
@@ -1584,13 +1634,13 @@
             } catch (e) {}
 
             function getFixedLeftBase() {
-                const marginX = Math.max(70, Math.min(110, W * 0.15));
-                const marginY = Math.max(70, Math.min(110, H * 0.22));
+                const marginX = Math.max(75, Math.min(110, W * 0.15));
+                const marginY = Math.max(75, Math.min(110, H * 0.24));
                 return { x: marginX, y: H - marginY };
             }
             function getFixedRightBase() {
-                const marginX = Math.max(70, Math.min(110, W * 0.15));
-                const marginY = Math.max(70, Math.min(110, H * 0.22));
+                const marginX = Math.max(75, Math.min(110, W * 0.15));
+                const marginY = Math.max(75, Math.min(110, H * 0.24));
                 return { x: W - marginX, y: H - marginY };
             }
 
@@ -1613,6 +1663,10 @@
                     joyRightBase.style.top = (rb.y * zoomScale) + 'px';
                     joyRightThumb.style.left = (rb.x * zoomScale) + 'px';
                     joyRightThumb.style.top = (rb.y * zoomScale) + 'px';
+                    fireRing.style.left = (rb.x * zoomScale) + 'px';
+                    fireRing.style.top = (rb.y * zoomScale) + 'px';
+                    fireRing.style.width = '110px';
+                    fireRing.style.height = '110px';
                     joyBase.classList.add('show');
                     joyRightBase.classList.add('show');
                     joyBase.style.opacity = '0.55';
@@ -1781,8 +1835,8 @@
                         joyRightThumb.classList.add('show');
                         fireRing.style.left = (rightStickBase.x * zoomScale) + 'px';
                         fireRing.style.top = (rightStickBase.y * zoomScale) + 'px';
-                        fireRing.style.width = '70px';
-                        fireRing.style.height = '70px';
+                        fireRing.style.width = '110px';
+                        fireRing.style.height = '110px';
                         fireRing.classList.add('show');
                         reticleEl.style.left = (pos.x * zoomScale) + 'px';
                         reticleEl.style.top = (pos.y * zoomScale) + 'px';
@@ -1821,10 +1875,9 @@
                         joyRightThumb.style.top = ((rightStickBase.y + dy) * zoomScale) + 'px';
                         reticleEl.style.left = ((rightStickBase.x + dx * 1.6) * zoomScale) + 'px';
                         reticleEl.style.top = ((rightStickBase.y + dy * 1.6) * zoomScale) + 'px';
-                        // Fire ring pulse
-                        const ringSize = 70 + 14 * (m / maxR);
-                        fireRing.style.width = ringSize + 'px';
-                        fireRing.style.height = ringSize + 'px';
+                        // Keep fireRing base at constant size (110px) so Fire joystick does NOT expand when dragged and matches Move joystick exactly
+                        fireRing.style.width = '110px';
+                        fireRing.style.height = '110px';
                         fireRing.style.left = (rightStickBase.x * zoomScale) + 'px';
                         fireRing.style.top = (rightStickBase.y * zoomScale) + 'px';
                     }
@@ -2936,5 +2989,5 @@
             addEventListener('resize', setVH);
         })();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26c9d7b9e657373',t:'MTc4NjAwNDM1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26cb4d3798ece8d',t:'MTc4NjAwNTMwNw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
