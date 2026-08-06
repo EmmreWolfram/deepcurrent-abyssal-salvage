@@ -1376,15 +1376,28 @@
                 H = innerHeight,
                 DPR = 1;
 
+            let zoomScale = 1;
+
             function resize() {
-                W = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-                H = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                const winW = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                const winH = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                
+                // Keep logical game world within optimal balanced twin-stick shooter resolution (prevents PC zoom-out from increasing spawn range or making screen huge)
+                const maxLogicalW = 1500;
+                const maxLogicalH = 900;
+                const scaleX = winW > maxLogicalW ? winW / maxLogicalW : 1;
+                const scaleY = winH > maxLogicalH ? winH / maxLogicalH : 1;
+                zoomScale = Math.max(1, Math.max(scaleX, scaleY));
+
+                W = Math.floor(winW / zoomScale);
+                H = Math.floor(winH / zoomScale);
                 DPR = Math.min(window.devicePixelRatio || 1, 2);
-                cvs.width = Math.floor(W * DPR);
-                cvs.height = Math.floor(H * DPR);
-                cvs.style.width = W + 'px';
-                cvs.style.height = H + 'px';
-                ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+
+                cvs.width = Math.floor(winW * DPR);
+                cvs.height = Math.floor(winH * DPR);
+                cvs.style.width = winW + 'px';
+                cvs.style.height = winH + 'px';
+                ctx.setTransform(DPR * zoomScale, 0, 0, DPR * zoomScale, 0, 0);
             }
             addEventListener('resize', resize);
             resize();
@@ -1560,8 +1573,10 @@
             let aimTouch = { x: 0, y: 0 };
             let touchActive = false;
 
-            // Detect touch device
-            const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            // Strictly check for true Android / iOS mobile and tablet touch devices (excludes PC/Mac desktops and laptops)
+            const isMobileOrTablet = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                                     (navigator.maxTouchPoints > 1 && /Macintosh/i.test(navigator.userAgent) && 'ontouchend' in document);
+            const isTouch = isMobileOrTablet && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
 
             let fixedJoystick = false;
             try {
@@ -1569,34 +1584,39 @@
             } catch (e) {}
 
             function getFixedLeftBase() {
-                const marginX = Math.max(75, Math.min(125, W * 0.16));
-                const marginY = Math.max(75, Math.min(125, H * 0.22));
+                const marginX = Math.max(70, Math.min(110, W * 0.15));
+                const marginY = Math.max(70, Math.min(110, H * 0.22));
                 return { x: marginX, y: H - marginY };
             }
             function getFixedRightBase() {
-                const marginX = Math.max(75, Math.min(125, W * 0.16));
-                const marginY = Math.max(75, Math.min(125, H * 0.22));
+                const marginX = Math.max(70, Math.min(110, W * 0.15));
+                const marginY = Math.max(70, Math.min(110, H * 0.22));
                 return { x: W - marginX, y: H - marginY };
             }
 
             function updateJoystickAnchors() {
+                if (!isTouch) {
+                    joyBase.classList.remove('show');
+                    joyThumb.classList.remove('show');
+                    joyRightBase.classList.remove('show');
+                    joyRightThumb.classList.remove('show');
+                    return;
+                }
                 if (fixedJoystick) {
                     const lb = getFixedLeftBase();
                     const rb = getFixedRightBase();
-                    joyBase.style.left = lb.x + 'px';
-                    joyBase.style.top = lb.y + 'px';
-                    joyThumb.style.left = lb.x + 'px';
-                    joyThumb.style.top = lb.y + 'px';
-                    joyRightBase.style.left = rb.x + 'px';
-                    joyRightBase.style.top = rb.y + 'px';
-                    joyRightThumb.style.left = rb.x + 'px';
-                    joyRightThumb.style.top = rb.y + 'px';
-                    if (isTouch) {
-                        joyBase.classList.add('show');
-                        joyRightBase.classList.add('show');
-                        joyBase.style.opacity = '0.55';
-                        joyRightBase.style.opacity = '0.55';
-                    }
+                    joyBase.style.left = (lb.x * zoomScale) + 'px';
+                    joyBase.style.top = (lb.y * zoomScale) + 'px';
+                    joyThumb.style.left = (lb.x * zoomScale) + 'px';
+                    joyThumb.style.top = (lb.y * zoomScale) + 'px';
+                    joyRightBase.style.left = (rb.x * zoomScale) + 'px';
+                    joyRightBase.style.top = (rb.y * zoomScale) + 'px';
+                    joyRightThumb.style.left = (rb.x * zoomScale) + 'px';
+                    joyRightThumb.style.top = (rb.y * zoomScale) + 'px';
+                    joyBase.classList.add('show');
+                    joyRightBase.classList.add('show');
+                    joyBase.style.opacity = '0.55';
+                    joyRightBase.style.opacity = '0.55';
                 } else {
                     if (moveId === null) {
                         joyBase.classList.remove('show');
@@ -1696,8 +1716,10 @@
             addEventListener('keyup', e => { keys[e.code] = false; });
 
             // Mouse
-            addEventListener('mousemove', e => { mouse.x = e.clientX;
-                mouse.y = e.clientY; });
+            addEventListener('mousemove', e => {
+                mouse.x = e.clientX / zoomScale;
+                mouse.y = e.clientY / zoomScale;
+            });
             addEventListener('mousedown', e => { initAudio(); if (AC && AC.state === 'suspended') AC.resume(); if (e
                     .button === 0) mouse.down = true; });
             addEventListener('mouseup', e => { if (e.button === 0) mouse.down = false; });
@@ -1707,10 +1729,14 @@
             // Touch
             function getTouchPos(t) {
                 const rect = cvs.getBoundingClientRect();
-                return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+                return {
+                    x: (t.clientX - rect.left) / zoomScale,
+                    y: (t.clientY - rect.top) / zoomScale
+                };
             }
 
             function handleTouchStart(e) {
+                if (!isTouch) return;
                 initAudio();
                 if (AC && AC.state === 'suspended') AC.resume();
                 if (e.target === cvs || e.target.closest('#touchOverlay')) {
@@ -1728,13 +1754,13 @@
                             stickBase = getFixedLeftBase();
                         } else {
                             stickBase = { x: pos.x, y: pos.y };
-                            joyBase.style.left = pos.x + 'px';
-                            joyBase.style.top = pos.y + 'px';
+                            joyBase.style.left = (pos.x * zoomScale) + 'px';
+                            joyBase.style.top = (pos.y * zoomScale) + 'px';
                             joyBase.classList.add('show');
                         }
                         stickVec = { x: 0, y: 0 };
-                        joyThumb.style.left = stickBase.x + 'px';
-                        joyThumb.style.top = stickBase.y + 'px';
+                        joyThumb.style.left = (stickBase.x * zoomScale) + 'px';
+                        joyThumb.style.top = (stickBase.y * zoomScale) + 'px';
                         joyThumb.classList.add('show');
                     }
                     // Right half: aim + fire
@@ -1744,28 +1770,29 @@
                             rightStickBase = getFixedRightBase();
                         } else {
                             rightStickBase = { x: pos.x, y: pos.y };
-                            joyRightBase.style.left = pos.x + 'px';
-                            joyRightBase.style.top = pos.y + 'px';
+                            joyRightBase.style.left = (pos.x * zoomScale) + 'px';
+                            joyRightBase.style.top = (pos.y * zoomScale) + 'px';
                             joyRightBase.classList.add('show');
                         }
                         rightStickVec = { x: 0, y: 0 };
                         aimTouch = { x: pos.x, y: pos.y };
-                        joyRightThumb.style.left = rightStickBase.x + 'px';
-                        joyRightThumb.style.top = rightStickBase.y + 'px';
+                        joyRightThumb.style.left = (rightStickBase.x * zoomScale) + 'px';
+                        joyRightThumb.style.top = (rightStickBase.y * zoomScale) + 'px';
                         joyRightThumb.classList.add('show');
-                        fireRing.style.left = rightStickBase.x + 'px';
-                        fireRing.style.top = rightStickBase.y + 'px';
+                        fireRing.style.left = (rightStickBase.x * zoomScale) + 'px';
+                        fireRing.style.top = (rightStickBase.y * zoomScale) + 'px';
                         fireRing.style.width = '70px';
                         fireRing.style.height = '70px';
                         fireRing.classList.add('show');
-                        reticleEl.style.left = pos.x + 'px';
-                        reticleEl.style.top = pos.y + 'px';
+                        reticleEl.style.left = (pos.x * zoomScale) + 'px';
+                        reticleEl.style.top = (pos.y * zoomScale) + 'px';
                         reticleEl.classList.add('show');
                     }
                 }
             }
 
             function handleTouchMove(e) {
+                if (!isTouch) return;
                 e.preventDefault();
                 const touches = e.changedTouches;
                 for (let i = 0; i < touches.length; i++) {
@@ -1779,8 +1806,8 @@
                         if (m > maxR) { dx = dx / m * maxR;
                             dy = dy / m * maxR; }
                         stickVec = { x: dx / maxR, y: dy / maxR };
-                        joyThumb.style.left = (stickBase.x + dx) + 'px';
-                        joyThumb.style.top = (stickBase.y + dy) + 'px';
+                        joyThumb.style.left = ((stickBase.x + dx) * zoomScale) + 'px';
+                        joyThumb.style.top = ((stickBase.y + dy) * zoomScale) + 'px';
                     } else if (t.identifier === aimId) {
                         let dx = pos.x - rightStickBase.x,
                             dy = pos.y - rightStickBase.y;
@@ -1790,21 +1817,22 @@
                             dy = dy / m * maxR; }
                         rightStickVec = { x: dx / maxR, y: dy / maxR };
                         aimTouch = { x: rightStickBase.x + dx, y: rightStickBase.y + dy };
-                        joyRightThumb.style.left = (rightStickBase.x + dx) + 'px';
-                        joyRightThumb.style.top = (rightStickBase.y + dy) + 'px';
-                        reticleEl.style.left = (rightStickBase.x + dx * 1.6) + 'px';
-                        reticleEl.style.top = (rightStickBase.y + dy * 1.6) + 'px';
+                        joyRightThumb.style.left = ((rightStickBase.x + dx) * zoomScale) + 'px';
+                        joyRightThumb.style.top = ((rightStickBase.y + dy) * zoomScale) + 'px';
+                        reticleEl.style.left = ((rightStickBase.x + dx * 1.6) * zoomScale) + 'px';
+                        reticleEl.style.top = ((rightStickBase.y + dy * 1.6) * zoomScale) + 'px';
                         // Fire ring pulse
                         const ringSize = 70 + 14 * (m / maxR);
                         fireRing.style.width = ringSize + 'px';
                         fireRing.style.height = ringSize + 'px';
-                        fireRing.style.left = rightStickBase.x + 'px';
-                        fireRing.style.top = rightStickBase.y + 'px';
+                        fireRing.style.left = (rightStickBase.x * zoomScale) + 'px';
+                        fireRing.style.top = (rightStickBase.y * zoomScale) + 'px';
                     }
                 }
             }
 
             function handleTouchEnd(e) {
+                if (!isTouch) return;
                 const touches = e.changedTouches;
                 for (let i = 0; i < touches.length; i++) {
                     const t = touches[i];
@@ -1817,8 +1845,8 @@
                         joyThumb.classList.remove('show');
                         if (fixedJoystick) {
                             const lb = getFixedLeftBase();
-                            joyThumb.style.left = lb.x + 'px';
-                            joyThumb.style.top = lb.y + 'px';
+                            joyThumb.style.left = (lb.x * zoomScale) + 'px';
+                            joyThumb.style.top = (lb.y * zoomScale) + 'px';
                         }
                     }
                     if (t.identifier === aimId) {
@@ -1832,8 +1860,8 @@
                         reticleEl.classList.remove('show');
                         if (fixedJoystick) {
                             const rb = getFixedRightBase();
-                            joyRightThumb.style.left = rb.x + 'px';
-                            joyRightThumb.style.top = rb.y + 'px';
+                            joyRightThumb.style.left = (rb.x * zoomScale) + 'px';
+                            joyRightThumb.style.top = (rb.y * zoomScale) + 'px';
                         }
                     }
                 }
@@ -2817,6 +2845,14 @@
                 updateFixedJoyUI();
                 const soundBtn = $('toggleSoundBtn');
                 if (soundBtn) soundBtn.textContent = muted ? 'OFF' : 'ON';
+                const joyRow = $('toggleFixedJoyBtn') ? $('toggleFixedJoyBtn').closest('.setting-row') : null;
+                if (joyRow) {
+                    joyRow.style.display = isTouch ? 'flex' : 'none';
+                    const joyHeader = joyRow.previousElementSibling;
+                    if (joyHeader && joyHeader.classList.contains('sys')) {
+                        joyHeader.style.display = isTouch ? 'block' : 'none';
+                    }
+                }
                 show($('settingsScreen'), true);
             }
             function closeSettings() {
@@ -2900,5 +2936,5 @@
             addEventListener('resize', setVH);
         })();
     </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26c8e3b2d03eb9d',t:'MTc4NjAwMzcyNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26c9d7b9e657373',t:'MTc4NjAwNDM1MQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
