@@ -1018,7 +1018,121 @@
                 font-size: clamp(.6rem, 2vw, 1rem);
             }
         }
+
+        /* ----- Settings & About modal enhancements ----- */
+        .setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: .85rem 1.1rem;
+            background: rgba(61, 242, 207, .05);
+            border: 1px solid rgba(61, 242, 207, .22);
+            margin-bottom: .8rem;
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+            transition: background .2s, border-color .2s;
+        }
+        .setting-row:hover {
+            background: rgba(61, 242, 207, .09);
+            border-color: rgba(61, 242, 207, .4);
+        }
+        .setting-row .title {
+            font-weight: 700;
+            color: var(--amber);
+            font-size: clamp(.85rem, 2.2vw, .95rem);
+            margin-bottom: .2rem;
+            letter-spacing: .05em;
+        }
+        .setting-row .desc {
+            font-size: clamp(.68rem, 1.8vw, .75rem);
+            color: rgba(217, 246, 240, .75);
+            line-height: 1.4;
+            max-width: 42ch;
+        }
+        .about-desc {
+            margin: .5rem 0 1rem;
+            line-height: 1.6;
+            color: rgba(217, 246, 240, .9);
+            font-size: clamp(.85rem, 2.1vw, .95rem);
+            max-width: 58ch;
+        }
+        .about-list {
+            margin: .4rem 0 1.2rem 1.2rem;
+            padding: 0;
+            color: rgba(217, 246, 240, .85);
+            font-size: clamp(.78rem, 1.9vw, .88rem);
+            line-height: 1.55;
+        }
+        .about-list li {
+            margin-bottom: .6rem;
+        }
+        .about-list li b {
+            color: var(--cyan);
+        }
+        .orientation-notice-box {
+            margin-top: .8rem;
+            padding: .6rem .8rem;
+            background: rgba(255, 194, 75, .08);
+            border: 1px solid rgba(255, 194, 75, .3);
+            clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+            transition: border-color .3s, background .3s;
+        }
+        .orientation-notice-box .nt-title {
+            font-size: .56rem;
+            letter-spacing: .2em;
+            color: var(--amber);
+            font-weight: 700;
+        }
+        .orientation-notice-box .nt-desc {
+            font-size: .74rem;
+            color: var(--ice);
+            margin-top: .25rem;
+            line-height: 1.4;
+        }
+        .hud-notice {
+            position: fixed;
+            top: 4.8rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            background: rgba(255, 194, 75, .15);
+            border: 1px solid var(--amber);
+            color: var(--ice);
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .12em;
+            padding: .4rem .9rem;
+            border-radius: 4px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .4s;
+            white-space: nowrap;
+            max-width: 90vw;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .hud-notice.show {
+            opacity: 1;
+        }
+
+        /* Responsive refinements for small/portrait devices */
+        @media (max-width: 580px) {
+            .setting-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: .6rem;
+            }
+            .setting-row button {
+                align-self: flex-end;
+                width: 100%;
+            }
+            .dossier {
+                max-height: 94vh;
+                padding: 1.1rem;
+            }
+        }
     </style>
+
 </head>
 <body>
     <canvas id="game"></canvas>
@@ -1053,6 +1167,7 @@
             <div class="depth-rail"><div id="depthFill"></div></div>
             <div><span class="lbl">DEPTH</span> <span id="depthVal">420 M</span></div>
         </div>
+        <div id="hudOrientationNotice" class="hud-notice">📱 OPTIMAL VIEW: ROTATE DEVICE TO LANDSCAPE FOR WIDER ARENA VIEW</div>
     </div>
 
     <div id="combo"></div>
@@ -1092,6 +1207,8 @@
                     <div class="btnrow">
                         <button class="btn btn-primary" id="diveBtn">▶ &nbsp;DIVE</button>
                         <button class="btn btn-ghost" id="briefBtn">BRIEFING</button>
+                        <button class="btn btn-ghost" id="settingsBtn">⚙️ &nbsp;SETTINGS</button>
+                        <button class="btn btn-ghost" id="aboutBtn">ℹ️ &nbsp;ABOUT</button>
                     </div>
                     <div class="brief" id="briefing">
                         <div class="sys">THREAT INTEL</div>
@@ -1122,6 +1239,12 @@
                         <div style="font-size:.55rem;letter-spacing:.2em;color:rgba(125,245,221,.6);">📱 TOUCH ENABLED</div>
                         <div style="font-size:.7rem;color:var(--cyan);margin-top:.15rem;">Twin-stick · Auto-fire · Visual joysticks</div>
                     </div>
+                    <div class="orientation-notice-box" id="orientationNotice">
+                        <div class="nt-title">🔄 OPTIMAL VIEWING: LANDSCAPE ORIENTATION</div>
+                        <div class="nt-desc">
+                            For the best mobile &amp; tablet experience, play in <b>Landscape orientation</b> so the entire play area is visible. Every device — phone, tablet, laptop, PC — is fully supported.
+                        </div>
+                    </div>
                 </div>
             </div>
             <p class="foot">DEEPCURRENT v1.1 — KILLS CHAIN COMBO · GRAB GLOWING MOTES · DIVE SAFE</p>
@@ -1137,6 +1260,7 @@
             <div class="btnrow">
                 <button class="btn btn-primary" id="resumeBtn">RESUME</button>
                 <button class="btn btn-ghost" id="pauseRestartBtn">RESTART</button>
+                <button class="btn btn-ghost" id="pauseSettingsBtn">⚙️ &nbsp;SETTINGS</button>
                 <button class="btn btn-ghost" id="pauseMuteBtn">SOUND</button>
                 <button class="btn btn-exit" id="pauseExitBtn">✕ EXIT</button>
             </div>
@@ -1164,6 +1288,83 @@
         </div>
     </div>
 
+    <!-- SETTINGS SCREEN -->
+    <div class="screen" id="settingsScreen" style="z-index: 45;">
+        <div class="dossier" style="width:min(560px,94vw)">
+            <div class="tab">DSV-07 // CONFIG</div>
+            <p class="kicker">SYSTEM PREFERENCES</p>
+            <h2 class="over-title" style="font-size:clamp(1.5rem,5vw,2.4rem);margin-bottom:.4rem;">SETTINGS</h2>
+            <p class="tag" style="margin-bottom:1.4rem;">Customize control mechanics and interface telemetry.</p>
+            
+            <div class="sys" style="margin-bottom:.6rem;">TOUCH CONTROL MECHANICS</div>
+            <div class="setting-row">
+                <div>
+                    <div class="title">FIXED JOYSTICK</div>
+                    <div class="desc">
+                        Fixed: Joysticks remain anchored in the bottom corners.<br>
+                        Dynamic: Joysticks appear wherever your thumbs touch.
+                    </div>
+                </div>
+                <button class="btn btn-ghost" id="toggleFixedJoyBtn" style="min-width:140px;text-align:center;">OFF (DYNAMIC)</button>
+            </div>
+
+            <div class="sys" style="margin-bottom:.6rem;">AUDIO SYSTEMS</div>
+            <div class="setting-row" style="margin-bottom:1.4rem;">
+                <div>
+                    <div class="title">SOUND EFFECTS</div>
+                    <div class="desc">Abyssal combat audio &amp; weapon feedback.</div>
+                </div>
+                <button class="btn btn-ghost" id="toggleSoundBtn" style="min-width:140px;text-align:center;">ON</button>
+            </div>
+
+            <div class="btnrow" style="margin-top:1rem;">
+                <button class="btn btn-primary" id="settingsCloseBtn">✓ &nbsp;APPLY &amp; CLOSE</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ABOUT SCREEN -->
+    <div class="screen" id="aboutScreen" style="z-index: 45;">
+        <div class="dossier" style="width:min(660px,94vw)">
+            <div class="tab">DSV-07 // DOSSIER</div>
+            <p class="kicker">PROJECT OVERVIEW &amp; CREDITS</p>
+            <h2 class="over-title" style="font-size:clamp(1.5rem,5vw,2.4rem);margin-bottom:.4rem;">ABOUT</h2>
+            
+            <div class="sys" style="margin-bottom:.5rem;">PROJECT MISSION</div>
+            <p class="about-desc">
+                <b>DEEPCURRENT</b> is basically a personal project to experiment if it’s possible to create certain control mechanics fit for mobile games.
+            </p>
+            
+            <div class="sys" style="margin-bottom:.5rem;">WHAT WE DID &amp; LEARNED</div>
+            <p class="about-desc" style="margin-bottom:1.2rem;font-size:clamp(.8rem,2vw,.9rem);color:rgba(217,246,240,.85);line-height:1.55;">
+                We tested twin-stick controls on mobile where aiming with the right stick automatically shoots your weapon. From testing on phones and tablets, we learned that clear visual hints (like the aiming target and fire ring) and giving players the choice between fixed or floating joysticks make mobile controls feel smooth, precise, and comfortable.
+            </p>
+
+            <div class="sys" style="margin-bottom:.6rem;">DEVELOPER &amp; CREDITS</div>
+            <div style="padding:.85rem 1.1rem;background:rgba(61,242,207,.06);border:1px solid rgba(61,242,207,.25);margin-bottom:1.3rem;clip-path:polygon(10px 0,100% 0,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%,0 10px);">
+                <div style="font-size:.58rem;letter-spacing:.25em;color:var(--cyan);font-weight:700;">CREATED BY</div>
+                <div style="font-size:1.1rem;color:var(--amber);font-weight:700;margin-top:.2rem;">Emmanuel Angelo M. De Castro (Emmre)</div>
+                <div style="font-size:.75rem;color:rgba(217,246,240,.75);margin-top:.3rem;">
+                    Game Design · Touch Mechanics R&amp;D · Abyssal Combat Systems
+                </div>
+            </div>
+
+            <div class="sys" style="margin-bottom:.6rem;">STUDIO &amp; SUPPORT</div>
+            <div class="btnrow" style="margin-bottom:1.4rem;flex-wrap:wrap;gap:.6rem;">
+                <a href="https://www.facebook.com/profile.php?id=61577297810780" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;">
+                    <span>🌐</span> <span>STUDIO PAGE</span>
+                </a>
+                <a href="https://mail.google.com/mail/?view=cm&amp;fs=1&amp;to=thelandfathers%40gmail.com" target="_blank" rel="noopener noreferrer" class="btn btn-ghost" style="text-decoration:none;display:inline-flex;align-items:center;gap:.5rem;" id="supportEmailBtn" title="thelandfathers@gmail.com">
+                    <span>✉️</span> <span>SUPPORT</span>
+                </a>
+            </div>
+
+            <div class="btnrow" style="margin-top:1rem;border-top:1px solid rgba(61,242,207,.15);padding-top:1rem;">
+                <button class="btn btn-primary" id="aboutCloseBtn">✓ &nbsp;CLOSE</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         (function() {
             "use strict";
@@ -1176,11 +1377,11 @@
                 DPR = 1;
 
             function resize() {
-                W = innerWidth;
-                H = innerHeight;
-                DPR = Math.min(devicePixelRatio || 1, 2);
-                cvs.width = W * DPR;
-                cvs.height = H * DPR;
+                W = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+                H = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+                DPR = Math.min(window.devicePixelRatio || 1, 2);
+                cvs.width = Math.floor(W * DPR);
+                cvs.height = Math.floor(H * DPR);
                 cvs.style.width = W + 'px';
                 cvs.style.height = H + 'px';
                 ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -1343,6 +1544,8 @@
                 if (master) master.gain.value = muted ? 0 : .16;
                 $('muteBtn').classList.toggle('muted', muted);
                 $('pauseMuteBtn').textContent = muted ? 'SOUND: OFF' : 'SOUND: ON';
+                const soundBtn = $('toggleSoundBtn');
+                if (soundBtn) soundBtn.textContent = muted ? 'OFF' : 'ON';
             }
 
             /* ================= INPUT ================= */
@@ -1360,11 +1563,122 @@
             // Detect touch device
             const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
+            let fixedJoystick = false;
+            try {
+                fixedJoystick = localStorage.getItem('deepcurrent_fixed_joystick') === 'true';
+            } catch (e) {}
+
+            function getFixedLeftBase() {
+                const marginX = Math.max(75, Math.min(125, W * 0.16));
+                const marginY = Math.max(75, Math.min(125, H * 0.22));
+                return { x: marginX, y: H - marginY };
+            }
+            function getFixedRightBase() {
+                const marginX = Math.max(75, Math.min(125, W * 0.16));
+                const marginY = Math.max(75, Math.min(125, H * 0.22));
+                return { x: W - marginX, y: H - marginY };
+            }
+
+            function updateJoystickAnchors() {
+                if (fixedJoystick) {
+                    const lb = getFixedLeftBase();
+                    const rb = getFixedRightBase();
+                    joyBase.style.left = lb.x + 'px';
+                    joyBase.style.top = lb.y + 'px';
+                    joyThumb.style.left = lb.x + 'px';
+                    joyThumb.style.top = lb.y + 'px';
+                    joyRightBase.style.left = rb.x + 'px';
+                    joyRightBase.style.top = rb.y + 'px';
+                    joyRightThumb.style.left = rb.x + 'px';
+                    joyRightThumb.style.top = rb.y + 'px';
+                    if (isTouch) {
+                        joyBase.classList.add('show');
+                        joyRightBase.classList.add('show');
+                        joyBase.style.opacity = '0.55';
+                        joyRightBase.style.opacity = '0.55';
+                    }
+                } else {
+                    if (moveId === null) {
+                        joyBase.classList.remove('show');
+                        joyThumb.classList.remove('show');
+                    }
+                    if (aimId === null) {
+                        joyRightBase.classList.remove('show');
+                        joyRightThumb.classList.remove('show');
+                    }
+                    joyBase.style.opacity = '1';
+                    joyRightBase.style.opacity = '1';
+                }
+            }
+
+            function toggleFixedJoystick() {
+                fixedJoystick = !fixedJoystick;
+                try {
+                    localStorage.setItem('deepcurrent_fixed_joystick', String(fixedJoystick));
+                } catch (e) {}
+                updateFixedJoyUI();
+                updateJoystickAnchors();
+            }
+
+            function updateFixedJoyUI() {
+                const btn = $('toggleFixedJoyBtn');
+                if (btn) {
+                    btn.textContent = fixedJoystick ? 'ON (FIXED)' : 'OFF (DYNAMIC)';
+                    btn.style.color = fixedJoystick ? 'var(--amber)' : 'var(--cyan)';
+                    btn.style.borderColor = fixedJoystick ? 'var(--amber)' : 'rgba(61,242,207,.3)';
+                }
+            }
+
+            function checkOrientationNotice() {
+                const isPortrait = H > W * 1.05;
+                const noticeEl = $('orientationNotice');
+                const hudNoticeEl = $('hudOrientationNotice');
+                if (noticeEl) {
+                    noticeEl.style.borderColor = isPortrait ? 'var(--amber)' : 'rgba(255,194,75,.3)';
+                    noticeEl.style.background = isPortrait ? 'rgba(255,194,75,.15)' : 'rgba(255,194,75,.08)';
+                }
+                if (hudNoticeEl) {
+                    if (isTouch && isPortrait && mode === 'playing') {
+                        hudNoticeEl.classList.add('show');
+                    } else {
+                        hudNoticeEl.classList.remove('show');
+                    }
+                }
+            }
+
             // Show touch controls on touch devices
             if (isTouch) {
                 joyBase.classList.add('show');
                 joyRightBase.classList.add('show');
             }
+            updateFixedJoyUI();
+
+            function onResizeEntities() {
+                p.x = clamp(p.x, 28, W - 28);
+                p.y = clamp(p.y, 28, H - 28);
+                for (const e of enemies) {
+                    const safeX = Math.min(e.r + 15, W * 0.35);
+                    const safeY = Math.min(e.r + 15, H * 0.35);
+                    e.x = clamp(e.x, safeX, W - safeX);
+                    e.y = clamp(e.y, safeY, H - safeY);
+                }
+                for (const t of teles) {
+                    t.x = clamp(t.x, 40, W - 40);
+                    t.y = clamp(t.y, 40, H - 40);
+                }
+                for (const o of orbs) {
+                    o.x = clamp(o.x, 20, W - 20);
+                    o.y = clamp(o.y, 20, H - 20);
+                }
+                for (const c of caps) {
+                    c.x = clamp(c.x, 25, W - 25);
+                    c.y = clamp(c.y, 25, H - 25);
+                }
+                updateJoystickAnchors();
+                checkOrientationNotice();
+            }
+            addEventListener('resize', onResizeEntities);
+            onResizeEntities();
 
             // Keyboard
             addEventListener('keydown', e => {
@@ -1410,29 +1724,37 @@
                     // Left half: movement
                     if (moveId === null && pos.x < W * 0.5) {
                         moveId = t.identifier;
-                        stickBase = { x: pos.x, y: pos.y };
+                        if (fixedJoystick) {
+                            stickBase = getFixedLeftBase();
+                        } else {
+                            stickBase = { x: pos.x, y: pos.y };
+                            joyBase.style.left = pos.x + 'px';
+                            joyBase.style.top = pos.y + 'px';
+                            joyBase.classList.add('show');
+                        }
                         stickVec = { x: 0, y: 0 };
-                        joyBase.style.left = pos.x + 'px';
-                        joyBase.style.top = pos.y + 'px';
-                        joyBase.classList.add('show');
-                        joyThumb.style.left = pos.x + 'px';
-                        joyThumb.style.top = pos.y + 'px';
+                        joyThumb.style.left = stickBase.x + 'px';
+                        joyThumb.style.top = stickBase.y + 'px';
                         joyThumb.classList.add('show');
                     }
                     // Right half: aim + fire
                     if (aimId === null && pos.x >= W * 0.4) {
                         aimId = t.identifier;
-                        rightStickBase = { x: pos.x, y: pos.y };
+                        if (fixedJoystick) {
+                            rightStickBase = getFixedRightBase();
+                        } else {
+                            rightStickBase = { x: pos.x, y: pos.y };
+                            joyRightBase.style.left = pos.x + 'px';
+                            joyRightBase.style.top = pos.y + 'px';
+                            joyRightBase.classList.add('show');
+                        }
                         rightStickVec = { x: 0, y: 0 };
                         aimTouch = { x: pos.x, y: pos.y };
-                        joyRightBase.style.left = pos.x + 'px';
-                        joyRightBase.style.top = pos.y + 'px';
-                        joyRightBase.classList.add('show');
-                        joyRightThumb.style.left = pos.x + 'px';
-                        joyRightThumb.style.top = pos.y + 'px';
+                        joyRightThumb.style.left = rightStickBase.x + 'px';
+                        joyRightThumb.style.top = rightStickBase.y + 'px';
                         joyRightThumb.classList.add('show');
-                        fireRing.style.left = pos.x + 'px';
-                        fireRing.style.top = pos.y + 'px';
+                        fireRing.style.left = rightStickBase.x + 'px';
+                        fireRing.style.top = rightStickBase.y + 'px';
                         fireRing.style.width = '70px';
                         fireRing.style.height = '70px';
                         fireRing.classList.add('show');
@@ -1489,16 +1811,30 @@
                     if (t.identifier === moveId) {
                         moveId = null;
                         stickVec = { x: 0, y: 0 };
-                        joyBase.classList.remove('show');
+                        if (!fixedJoystick) {
+                            joyBase.classList.remove('show');
+                        }
                         joyThumb.classList.remove('show');
+                        if (fixedJoystick) {
+                            const lb = getFixedLeftBase();
+                            joyThumb.style.left = lb.x + 'px';
+                            joyThumb.style.top = lb.y + 'px';
+                        }
                     }
                     if (t.identifier === aimId) {
                         aimId = null;
                         rightStickVec = { x: 0, y: 0 };
-                        joyRightBase.classList.remove('show');
+                        if (!fixedJoystick) {
+                            joyRightBase.classList.remove('show');
+                        }
                         joyRightThumb.classList.remove('show');
                         fireRing.classList.remove('show');
                         reticleEl.classList.remove('show');
+                        if (fixedJoystick) {
+                            const rb = getFixedRightBase();
+                            joyRightThumb.style.left = rb.x + 'px';
+                            joyRightThumb.style.top = rb.y + 'px';
+                        }
                     }
                 }
                 if (moveId === null && aimId === null) touchActive = false;
@@ -1586,13 +1922,18 @@
             }
 
             function edgePos() {
+                const marginX = Math.max(45, Math.min(85, W * 0.08));
+                const marginY = Math.max(45, Math.min(85, H * 0.08));
                 let x = 0,
                     y = 0;
-                for (let i = 0; i < 10; i++) { const s = randi(4); if (s === 0) { x = Math.random() * W;
-                        y = -40; } else if (s === 1) { x = W + 40;
-                        y = Math.random() * H; } else if (s === 2) { x = Math.random() * W;
-                        y = H + 40; } else { x = -40;
-                        y = Math.random() * H; } if (dist2(x, y, p.x, p.y) > 180 * 180) break; }
+                for (let i = 0; i < 20; i++) {
+                    const s = randi(4);
+                    if (s === 0) { x = rand(marginX, W - marginX); y = marginY; }
+                    else if (s === 1) { x = W - marginX; y = rand(marginY, H - marginY); }
+                    else if (s === 2) { x = rand(marginX, W - marginX); y = H - marginY; }
+                    else { x = marginX; y = rand(marginY, H - marginY); }
+                    if (dist2(x, y, p.x, p.y) > 160 * 160) break;
+                }
                 return { x, y };
             }
 
@@ -1747,7 +2088,8 @@
                         e.vy += ((ny * sp + nx * strafe * .4) - e.vy) * k;
                         e.ang = Math.atan2(dy, dx);
                     } else if (e.kind === 'spitter') {
-                        const want = d > 300 ? 1 : -1,
+                        const nearEdge = (e.x < 75 || e.x > W - 75 || e.y < 75 || e.y > H - 75);
+                        const want = (d > 300 || nearEdge) ? 1 : -1,
                             k = 1 - Math.exp(-3 * dt);
                         const px = -ny,
                             py = nx,
@@ -1773,6 +2115,10 @@
                     }
                     e.x += e.vx * dt;
                     e.y += e.vy * dt;
+                    const safeX = Math.min(e.r + 15, W * 0.35);
+                    const safeY = Math.min(e.r + 15, H * 0.35);
+                    e.x = clamp(e.x, safeX, W - safeX);
+                    e.y = clamp(e.y, safeY, H - safeY);
                     if (live && !p.dead) {
                         const rr = e.r + p.r - 2;
                         if (dist2(e.x, e.y, p.x, p.y) < rr * rr) {
@@ -2244,8 +2590,34 @@
                 ctx.restore();
             }
 
+            function drawArenaBorder() {
+                if (mode === 'title') return;
+                const m = 18;
+                ctx.save();
+                ctx.strokeStyle = 'rgba(61, 242, 207, 0.16)';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(m, m, W - m * 2, H - m * 2);
+
+                // Corner brackets
+                const len = Math.min(40, W * 0.05);
+                ctx.strokeStyle = 'rgba(61, 242, 207, 0.55)';
+                ctx.lineWidth = 2;
+                // top-left
+                ctx.beginPath();
+                ctx.moveTo(m, m + len); ctx.lineTo(m, m); ctx.lineTo(m + len, m);
+                // top-right
+                ctx.moveTo(W - m - len, m); ctx.lineTo(W - m, m); ctx.lineTo(W - m, m + len);
+                // bottom-left
+                ctx.moveTo(m, H - m - len); ctx.lineTo(m, H - m); ctx.lineTo(m + len, H - m);
+                // bottom-right
+                ctx.moveTo(W - m - len, H - m); ctx.lineTo(W - m, H - m); ctx.lineTo(W - m, H - m - len);
+                ctx.stroke();
+                ctx.restore();
+            }
+
             function render() {
                 drawBackground();
+                drawArenaBorder();
                 drawSnow(false);
                 drawSilhouette();
                 ctx.save();
@@ -2378,12 +2750,11 @@
                 show($('titleScreen'), false);
                 show($('overScreen'), false);
                 show($('pauseScreen'), false);
+                show($('aboutScreen'), false);
+                show($('settingsScreen'), false);
                 hudEl.classList.remove('off');
-                // Show touch controls if touch device
-                if (isTouch) {
-                    joyBase.classList.add('show');
-                    joyRightBase.classList.add('show');
-                }
+                updateJoystickAnchors();
+                checkOrientationNotice();
                 startWave(1);
             }
 
@@ -2397,6 +2768,8 @@
                 mode = 'title';
                 show($('pauseScreen'), false);
                 show($('overScreen'), false);
+                show($('aboutScreen'), false);
+                show($('settingsScreen'), false);
                 show($('titleScreen'), true);
                 hudEl.classList.add('off');
                 document.body.classList.remove('critical');
@@ -2406,6 +2779,8 @@
                 bestVal.textContent = best.toLocaleString();
                 // Reset audio
                 if (master) master.gain.value = muted ? 0 : .16;
+                updateJoystickAnchors();
+                checkOrientationNotice();
             }
 
             const OVERLINES = ['The trench keeps what it takes.', 'Hull breach at terminal depth. Beacon silent.',
@@ -2438,7 +2813,44 @@
                 reticleEl.classList.remove('show');
             }
 
+            function openSettings() {
+                updateFixedJoyUI();
+                const soundBtn = $('toggleSoundBtn');
+                if (soundBtn) soundBtn.textContent = muted ? 'OFF' : 'ON';
+                show($('settingsScreen'), true);
+            }
+            function closeSettings() {
+                show($('settingsScreen'), false);
+            }
+            function openAbout() {
+                show($('aboutScreen'), true);
+            }
+            function closeAbout() {
+                show($('aboutScreen'), false);
+            }
+
             // Event listeners
+            $('aboutScreen').addEventListener('click', e => {
+                if (e.target === $('aboutScreen')) closeAbout();
+            });
+            $('settingsScreen').addEventListener('click', e => {
+                if (e.target === $('settingsScreen')) closeSettings();
+            });
+            $('settingsBtn').addEventListener('click', e => { e.target.blur();
+                openSettings(); });
+            $('aboutBtn').addEventListener('click', e => { e.target.blur();
+                openAbout(); });
+            $('pauseSettingsBtn').addEventListener('click', e => { e.target.blur();
+                openSettings(); });
+            $('settingsCloseBtn').addEventListener('click', e => { e.target.blur();
+                closeSettings(); });
+            $('aboutCloseBtn').addEventListener('click', e => { e.target.blur();
+                closeAbout(); });
+            $('toggleFixedJoyBtn').addEventListener('click', e => { e.target.blur();
+                toggleFixedJoystick(); });
+            $('toggleSoundBtn').addEventListener('click', e => { e.target.blur();
+                initAudio();
+                toggleMute(); });
             $('diveBtn').addEventListener('click', e => { e.target.blur();
                 startGame(); });
             $('briefBtn').addEventListener('click', e => { e.target.blur();
@@ -2488,5 +2900,5 @@
             addEventListener('resize', setVH);
         })();
     </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a26c8e3b2d03eb9d',t:'MTc4NjAwMzcyNg=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
